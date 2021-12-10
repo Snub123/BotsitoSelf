@@ -25,7 +25,7 @@ def clear():
   system("cls")
 
 
-token = ("ODM3MDY5OTg2MzUwNDk3ODMy.YaozCQ.bIpDsVUYqD2boT61loqya06fOuM")
+token = ("Tokenaca")
 
 ping = True
 
