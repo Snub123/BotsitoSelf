@@ -1,0 +1,313 @@
+from typing import ValuesView
+import time
+import datetime
+from time import sleep
+import json
+import random
+import string
+from os import system, name
+import os
+from discord.ext import commands
+from urllib import parse, request
+import re
+import asyncio
+import urllib.parse 
+import io
+import discord
+import DiscordUtils
+import requests
+from colorama import Fore
+import urllib.request
+from urllib import parse, request
+
+
+def clear():
+  system("cls")
+
+
+token = ("ODM3MDY5OTg2MzUwNDk3ODMy.YaozCQ.bIpDsVUYqD2boT61loqya06fOuM")
+
+ping = True
+
+bot = commands.Bot(command_prefix=("?"), self_bot=True)
+music = DiscordUtils.Music()
+
+
+@bot.event
+async def on_message(message):
+  await bot.process_commands(message)
+
+@bot.event
+async def on_ready():
+  await bot.change_presence(activity=discord.Streaming(name='.gg/antiplague', url= 'https://www.twitch.tv/elpepe'))
+  print(f'Has sido Loggeado Correctamente en el bot')
+
+
+bot.remove_command("help")
+
+
+@bot.command(aliases=["8ball", '8b'])
+async def ball(ctx, *, questions):
+    responses = ["Es cierto.",
+                "Es decididamente así.",
+                "Sin duda.",
+                "Sí definitivamente.",
+                "Puedes confiar en ello.",
+                "Como yo lo veo, sí.",
+                "Más probable.",
+                "Nunca, o eso creo.",
+                "Las señales apuntan a que sí.",
+                "Mejor no decirte ahora.",
+                "No cuentes con eso",
+                "Mi respuesta es no.",
+                "Mis fuentes dicen que no.",
+                "Muy dudoso."]
+
+    ball1 = discord.Embed(title=f"Ball!", description = f'🎱Tu Pregunta: {questions}\n\n🎱Respuesta: {random.choice(responses)}', color=discord.Color.blue())
+    ball1.set_thumbnail(url="https://media.discordapp.net/attachments/901140753378603118/906190268439621632/depositphotos_6012651-stock-photo-pool-ball-shot.png?width=540&height=540")
+    ball1.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+
+    await ctx.send(embed=ball1)
+
+
+
+@bot.command(aliases=['Join', 'JOIN'])
+async def join(ctx):
+  voicetrue = ctx.author.voice
+  if voicetrue is None:
+    join1 = discord.Embed(description=":x: Debes Estar En Un Canal De Voz!", color=discord.Color.red())
+    return await ctx.send(embed=join1)
+  await ctx.author.voice.channel.connect()
+  
+  
+@bot.command(aliases=['Leave', 'LEAVE'])
+async def leave(ctx):
+  voicetrue = ctx.author.voice
+  mevoicetrue = ctx.guild.me.voice
+  if voicetrue is None:
+    leave1 = discord.Embed(description=":x: Debes Estar En Un Canal De Voz!", color=discord.Color.red())
+    return await ctx.send(embed=leave1)
+  if mevoicetrue is None:
+    leave2 = discord.Embed(description=":x: Debes Unirme En Un Canal De Voz!", color=discord.Color.red())
+    return await ctx.send(embed=leave2)
+  await ctx.voice_client.disconnect()
+
+@bot.command(aliases=['expulsar'])
+async def kick(ctx, member:discord.Member, *, reason=None):
+   await member.kick(reason=reason)  
+   await ctx.send(f'El Usuario: {member.mention} Fue Expulsado Por la Razon: {reason} Corrrectamente!')
+
+@bot.command(aliases=['Banear'])
+async def ban(ctx, member:discord.Member, *, reason=None):
+    await member.ban(reason=reason)
+    await ctx.send(f'El Usuario: {member.mention} Fue Baneado Por la Razon: {reason} Correctamente!')
+
+@bot.command(aliases=['desbanear'])  
+async def unban(ctx, *, member):
+    banned_users = await ctx.guild.bans()
+    member_name, member_discriminator = member.split('#') 
+
+    for ban_entry in banned_users:
+        user = ban_entry.user
+
+        if(user.name, user.discriminator) == (member_name, member_discriminator):
+            await ctx.guild.unban(user)
+            await ctx.send(f'El Usuario {user.mention} Fue Desbaneado Correctamente!')
+            return
+
+@bot.command()
+async def avatar(ctx, member : discord.Member = None):
+    if member == None:
+        member = ctx.author
+
+        memberAvatar = member.avatar_url
+
+        avaEmbed = discord.Embed(title = f"{member.name}'s Avatar")
+        avaEmbed.set_image(url = memberAvatar)
+
+        await ctx.send(embed = avaEmbed)
+
+
+@bot.command()
+async def mute(ctx, member : discord.Member, *, reason=None):
+    if (not ctx.author.guild_permissions.manage_messages):
+        await ctx.send('Necesito El Permiso De **Gestionar Mensajes**')
+        return
+
+    guild = ctx.guild
+    mutedRole = discord.utils.get(guild.roles, name="Muted")
+
+    if not mutedRole:
+        mutedRole = await guild.create_role(name="Muted")
+
+
+        for channel in guild.channels:
+            await ctx.send('No se ha Encontrado El Rol Muted\nCreando Rol Muted...')
+            await channel.set_permissions(mutedRole, speak=False, send_messages=False, read_message_history=True, read_messages=True)
+    await member.add_roles(mutedRole, reason=reason)
+    await ctx.send('El Usuario Fue Muteado Correctamente!')
+    await member.send(f"Fuiste Muteado en el Server De: **{guild.name}** Por la Razon: **{reason}**")
+
+        
+
+
+
+@bot.command()
+async def ping(ctx):
+  
+    await ctx.send(f'El Ping Del Self Bot Es {round (bot.latency * 1000)} ms!')
+
+
+@bot.command()
+async  def  help(ctx):
+  des = """
+
+  `ping: Funciona Para Ver El Ping Del Bot`
+
+  `avatar: Vez tu Avatar!`
+
+  `iww: Comando de el Self-Bot`\n
+  
+  `join: Te Quedas 24/7 en un canal de voz`
+
+  `purge: Elimina todos los mensajes SOLO PARA MENSAJES PRIVADOS O DMS O SERVERS COMO MIERDA QUIERAS `\n
+
+  `hypesquad: Cambia tu casa de hypesquad`\n
+
+  `?ball: Pregunta a la Bola magica `
+
+  **COMANDOS PARA SERVIDORES **
+
+  `.$ : Raidsito?`
+
+  `.% : Para mandar dm a todos tus contactos`
+
+  `.& : Banall`
+
+  `.# : CAMBIAS EL NOMBRE A TODOS`
+
+  `./ : Crear Roles`
+
+  `?ban : Para banear a un usuario `
+
+  `?kick : Expulsar a un usuario`
+
+  `?unban : Si no entiendes eres idiota`
+
+  `mute : Mutear algun usuario`
+
+  `unmute : LO DESMUTEAS PENDEJO`
+
+  `CLEAR : ESTE BORRA PERO NO TUS MENSAJES BORRA LOS MENSAJES DE LOS DEMAS ASI Q CUIDADO CON TU INTERNET E.E`
+
+  **COMANDOS PARA SERVIDORES PENDEJO**
+
+  `Prefix:`  **?**\n
+
+  """
+  embed = discord.Embed(title="Cuenta Loggeada Con Botsito",url="https://cdn.discordapp.com/avatars/809827305295314967/babea11271bbf5a89d5bf15220e7c278.web24%22",description=des,
+  color=0x1C1C1C)
+  embed.set_thumbnail(url='https://media.discordapp.net/attachments/862826554304364605/890780260675764244/c.r.o.jpg?width=600&height=600')
+
+  timestamp=datetime.datetime.utcnow(),
+  await ctx.send(embed=embed)
+
+@bot.command()
+async def unmute(ctx, member : discord.Member, *, reason=None):
+    if (not ctx.author.guild_permissions.manage_messages):
+        await ctx.send('Necesito El Permiso De **Gestionar Mensajes**')
+        return
+
+    guild = ctx.guild
+    mutedRole = discord.utils.get(guild.roles, name="Muted")
+
+    if not mutedRole:
+        mutedRole = await guild.create_role(name="Muted")
+        return
+
+
+    await member.remove_roles(mutedRole, reason=reason)
+    await ctx.send('El Usuario Fue Desmuteado Correctamente!')
+    await member.send(f"Fuiste Desmuteado en el Server De: **{guild.name}** Por la Razon: **{reason}**")
+
+
+@bot.command(aliases=['CLEAR', 'Clear'])
+async def clear(ctx, amount=11):
+  
+  
+  clearerror1 = discord.Embed(description=f"No Puedo Borrar Mas de 100 Mensajes!", color=discord.Color.red())
+
+  clearembed = discord.Embed(description=f"Los Mensajes Fueron Borrados Correctamente!", color=discord.Color.green())
+  
+  amount = amount+1
+  if amount > 101:
+    await ctx.send(embed = clearerror1)
+  else:
+    await ctx.channel.purge(limit=amount)
+    await ctx.send(embed = clearembed)
+
+
+
+
+@bot.command()
+async def purge(message):
+  await message.send('**Purgeando Sus Mensajes**')
+  async for msg in message.channel.history(limit=1000):
+    if msg.author == bot.user:
+      try:
+        await msg.delete()
+      except:
+        pass
+  await message.send('Los mensajes Fueron Borrados Correctamente!')
+  print('XD')
+
+@bot.command()
+async def button(ctx):
+  await ctx.send(
+    "This is a Button!",
+    components = [
+      Button(label = 'Click Me!')
+    ]
+  )
+  interaction = await client.wait_for("button_click", check=lambda i: i.component.label.startswith("Click"))
+  await interaction.respond(content="Button Clicked!")
+
+
+
+
+        
+
+
+
+@bot.command()
+async def hypesquad(ctx, house):
+  await ctx.message.delete()
+  request = requests.session()
+  headers = {
+    'Authorization': token,
+    'Content-Type': 'application/json'
+  }
+
+  global payload
+
+  if house == "bravery":
+    payload = {'house_id': 1}
+  elif house == "brilliance":
+    payload = {'house_id': 2}
+  elif house == "balance":
+    payload = {'house_id': 3}
+
+  try:
+    requests.post('https://discordapp.com/api/v6/hypesquad/online', headers=headers, json=payload)
+    print(f"{Fore.GREEN}Has cambiado a {house} correctamente!")
+  except:
+    print(f"{Fore.RED}Ha ocurrido un error al intentar cambiarte a {house}")
+
+
+while True:
+  try:
+    bot.run(token, bot=False)
+  except:
+    clear()
+    print("El token es inválido, revisa que este escrito correctamente idiota")
+    quit()
